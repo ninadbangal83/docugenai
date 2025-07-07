@@ -1,0 +1,6 @@
+node_modules
+build
+resources
+dist
+public/js
+package-lock.json
