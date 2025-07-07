@@ -1,0 +1,64 @@
+# =========================
+# Global Git Ignore File
+# =========================
+
+# Node.js & Package Dependencies
+**/node_modules/
+**/build/
+**/dist/
+**/coverage/
+
+# Compiled & Build Files
+*.log
+*.out
+*.pid
+*.seed
+*.stackdump
+*.tsbuildinfo
+
+# TypeScript Cache & IDE Settings
+*.tsbuildinfo
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Temporary & System Files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.cache
+.nyc_output/
+.npm/
+.pnp/
+.pnp.js
+
+# Jest & Testing
+jest/
+jest-cache/
+jest-stare/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+#Ignore below files
+**/license.txt
+#Ignore below files
+**/license.txt
+CMakeLists.txt.user
+engines/hoops/sc-server/public/assets/models/V--50_V00000_1-4.scs
+
+*.sci
+*.scd
+
+# Ignore all .env files and their variants
+.env*
+
+# Ignore specific directory from root
+/engines/hoops/minio-data/
+/engines/hoops/conversion/hoops_bin/
+
