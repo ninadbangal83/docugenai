@@ -49,8 +49,6 @@ jest-stare/
 **/license.txt
 #Ignore below files
 **/license.txt
-CMakeLists.txt.user
-engines/hoops/sc-server/public/assets/models/V--50_V00000_1-4.scs
 
 *.sci
 *.scd
@@ -58,7 +56,41 @@ engines/hoops/sc-server/public/assets/models/V--50_V00000_1-4.scs
 # Ignore all .env files and their variants
 .env*
 
-# Ignore specific directory from root
-/engines/hoops/minio-data/
-/engines/hoops/conversion/hoops_bin/
+
+
+# =========================
+# AI Service - Python Files & Dependencies
+# =========================
+
+# Virtual Environment
+/ai-service/venv/
+/ai-service/.env
+/ai-service/.env.*
+
+# Python Cache
+/ai-service/__pycache__/
+/ai-service/**/*.pyc
+/ai-service/**/*.pyo
+/ai-service/**/*.pyd
+
+# Model & Tokenizer files (Hugging Face or others)
+/ai-service/*.safetensors
+/ai-service/*.bin
+/ai-service/*.pt
+/ai-service/**/*.safetensors
+/ai-service/**/*.bin
+/ai-service/**/*.pt
+
+# Logs and Outputs
+/ai-service/*.log
+/ai-service/output/
+/ai-service/temp/
+
+# Jupyter Notebooks (if any)
+/ai-service/**/*.ipynb_checkpoints
+
+# VSCode/IDE Configs
+/ai-service/.vscode/
+/ai-service/.idea/
+
 
