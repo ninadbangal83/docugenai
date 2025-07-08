@@ -1,15 +1,18 @@
 import { Response } from "express";
 import userService from "../services/userService.js";
 import { AuthRequest } from "../middleware/auth.js"; // Make sure AuthRequest is exported from auth middleware
+import User from "../models/userModel.js";
 
 // 🔹 Create user
 export const createUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    console.log('create')
+    console.log("create");
     const newUser = await userService.createUser(req.body);
+    const token = await newUser.generateAuthToken();
     res.status(201).json({
       status: "success",
       newUser,
+      token,
       message: "User registered successfully!",
     });
   } catch {
@@ -122,3 +125,27 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
     res.status(500).json({ status: "failed", message: "Failed to delete account!" });
   }
 };
+
+export const getAllUsers = async (req: AuthRequest, res: Response) => {
+  console.log("object");
+  const users = await User.find().select("-password -tokens");
+  res.json(users);
+};
+
+export const deleteUserById = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const deletedUser = await userService.deleteUser(req.params.id);
+        if (!deletedUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.status(200).json({
+      message: "User and associated files deleted successfully",
+      user: deletedUser,
+    });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
