@@ -2,7 +2,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import userRoute from "./routes/userRoute.js"; // ✅ Adjust path if needed
-import uploadRoute from "./routes/uploadRoute.js";
+import documentRoute from "./routes/documentRoute.js";
 
 // THEN import mongoose
 import "./db/mongoose.js";
@@ -24,6 +24,6 @@ app.use(express.json());
 
 // Routes
 app.use(userRoute);
-app.use(uploadRoute);
+app.use(documentRoute);
 
 export default app;

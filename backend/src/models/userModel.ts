@@ -2,6 +2,7 @@ import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { deleteUserUploads } from "../services/documentService.js";
 
 // 🔷 Interface for a single token object
 interface IToken {
@@ -15,6 +16,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   tokens: IToken[];
+  isAdmin: boolean;
   generateAuthToken(): Promise<string>;
   toJSON(): object;
 }
@@ -63,6 +65,10 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
         },
       },
     ],
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );
@@ -116,6 +122,17 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 
   next();
+});
+
+userSchema.post("findOneAndDelete", async function (doc: IUser) {
+  if (doc) {
+    try {
+      await deleteUserUploads(doc._id.toString());
+      console.log(`Deleted uploads for user ${doc._id}`);
+    } catch (err) {
+      console.error(`Failed to delete user uploads for ${doc._id}:`, err);
+    }
+  }
 });
 
 // 🔷 Create and export model

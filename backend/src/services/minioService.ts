@@ -23,3 +23,7 @@ export const uploadToMinIO = async (file: Express.Multer.File) => {
   await minioClient.putObject(bucketName, objectName, file.buffer);
   return { objectName, bucketName };
 };
+
+export const removeFromMinIO = async (bucket: string, object: string) => {
+  await minioClient.removeObject(bucket, object);
+};
