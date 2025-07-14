@@ -1,39 +1,108 @@
 version: "3.9"
 
 services:
+  # ---------------------
+  # Backend API Service
+  # ---------------------
   backend:
     build:
-      context: ./backend
+      context: ./backend  # Path to the backend Dockerfile and source code
     ports:
-      - "5000:5000"
+      - "4000:4000"  # Map container port 4000 to host port 4000
+    environment:
+      - PORT=4000
+      - MONGODB_URL=mongodb://root:rootpassword@mongodb:27017/docugenai?authSource=admin
+      - JWT_SECRET=thisismyjwtsecretkey
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=docugenai
+    depends_on:
+      - mongodb     # Ensure MongoDB is started before backend
+      - minio       # Ensure MinIO is started before backend
+      - ai-service  # Ensure AI service is started before backend
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart unless manually stopped
+
+  # ---------------------
+  # MongoDB Database
+  # ---------------------
+  mongodb:
+    image: mongo:6  # Use official MongoDB image
+    restart: always
+    ports:
+      - "27017:27017"  # Expose MongoDB port
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+      - MONGO_INITDB_DATABASE=docugenai
     volumes:
-      - ./backend:/app
+      - mongo-data:/data/db  # Persist database data
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro  # Init script
+    networks:
+      - app-network
+
+  # ---------------------
+  # Frontend (React App)
+  # ---------------------
+  frontend:
+    build:
+      context: ./frontend  # Path to the frontend Dockerfile and source code
+    ports:
+      - "3000:80"  # Map container port 80 to host port 3000
+    depends_on:
+      - backend  # Ensure backend is started before frontend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ---------------------
+  # MinIO Object Storage
+  # ---------------------
+  minio:
+    image: minio/minio  # Use official MinIO image
+    command: server /data --console-address ":9001"  # Enable console UI on port 9001
+    ports:
+      - "9000:9000"  # Main MinIO API port
+      - "9001:9001"  # MinIO console UI port
+    volumes:
+      - minio_data:/data  # Persist object storage data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ---------------------
+  # AI Service (OCR, GenAI, etc.)
+  # ---------------------
+  ai-service:
+    build:
+      context: ./ai-service  # Path to AI service Dockerfile and source
+    ports:
+      - "8001:8001"  # Map container port to host port
     environment:
       - MINIO_ENDPOINT=minio
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
     depends_on:
-      - minio
+      - minio  # Ensure MinIO is started before AI service
+    networks:
+      - app-network
+    restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "3000:80"  # Expose nginx on port 80 mapped to host port 3000
-    depends_on:
-      - backend
-
-  minio:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-
+# ---------------------
+# Named Volumes
+# ---------------------
 volumes:
-  minio_data:
+  mongo-data:  # For persisting MongoDB data
+  minio_data:  # For persisting MinIO data
+
+# ---------------------
+# Shared Network
+# ---------------------
+networks:
+  app-network:  # Shared network for all services

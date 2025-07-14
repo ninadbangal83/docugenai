@@ -11,7 +11,7 @@ interface SaveMetadataProps {
 }
 
 async function getAIInsights(objectName: string, bucketName: string) {
-  const res = await axios.post("http://localhost:8001/process", {
+  const res = await axios.post("http://ai-service:8001/process", {
     objectName,
     bucketName,
   });
@@ -27,6 +27,7 @@ export const saveUploadMetadata = async ({
   try {
     const insights = await getAIInsights(objectName, bucketName);
 
+    console.log(insights)
     const newUpload = new Upload({
       userId,
       filename: file.originalname,

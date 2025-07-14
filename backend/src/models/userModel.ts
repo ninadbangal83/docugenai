@@ -137,4 +137,5 @@ userSchema.post("findOneAndDelete", async function (doc: IUser) {
 
 // 🔷 Create and export model
 const User = mongoose.model<IUser, IUserModel>("User", userSchema);
+
 export default User;

@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+.env
+.env.*
+*.log
+*.lock
+coverage/
+.DS_Store
+.vscode/
+.idea/
+tests/
+__snapshots__/
+*.test.*
+*.spec.*
